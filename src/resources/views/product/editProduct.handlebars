@@ -1,0 +1,48 @@
+<div class='mt-4'>
+    <h3>Edit Product</h3>
+
+    <form method='POST' action='/products/{{product._id}}?_method=PUT'>
+        <div class='mb-3'>
+            <label for='name' class='form-label'>Name</label>
+            <input
+                type='text'
+                class='form-control'
+                id='name'
+                name='proName'
+                value='{{product.proName}}'
+            />
+        </div>
+        <div class='mb-3'>
+            <label for='desc' class='form-label'>Description</label>
+            <input
+                type='text'
+                class='form-control'
+                id='desc'
+                name='desc'
+                value='{{product.desc}}'
+            />
+        </div>
+        <div class='mb-3'>
+            <label for='brand' class='form-label'>Brand</label>
+            <input
+                type='text'
+                class='form-control'
+                id='brand'
+                name='brand'
+                value='{{product.brand}}'
+            />
+        </div>
+        <div class='mb-3'>
+            <label for='imageURL' class='form-label'>Image URL</label>
+            <input
+                type='text'
+                class='form-control'
+                id='imageURL'
+                name='image'
+                value='{{product.image}}'
+            />
+        </div>
+
+        <button type='submit' class='btn btn-primary'>Save</button>
+    </form>
+</div>

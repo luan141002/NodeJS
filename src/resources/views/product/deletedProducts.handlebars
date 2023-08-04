@@ -1,0 +1,134 @@
+<form class='mt-4' method='POST' name='container-form' action='/products/multiple-product-action'>
+
+    <div class='d-flex justify-content-between'>
+        <div>
+            <h3>Sản Phẩm đã xóa</h3>
+            <a href='/personal/stored/manage'>Danh sách sản phẩm trong kho</a>
+            <div class='d-flex gap-3 mt-2 align-items-center'>
+                <div class='form-check'>
+                    <input class='form-check-input' type='checkbox' value='' id='checkAllBtn' />
+                    <label class='form-check-label' for='checkAllBtn'>
+                        Chọn tất cả
+                    </label>
+                </div>
+                <div>
+                    <select class='form-select form-select-sm' aria-label='.form-select-sm example'
+                        class='action-selection' name='actions' required>
+                        <option value='' selected>-- Hành động --</option>
+                        <option value='forceDelete'>Xóa</option>
+                        <option value='restore'>Hoàn lại</option>
+                    </select>
+                </div>
+                <button type='submit' class='btn btn-primary option-action-btn disabled'>Thực Hiện
+                </button>
+            </div>
+        </div>
+    </div>
+    <table class='table'>
+        <thead>
+            <tr>
+                <th scope='col'>#</th>
+                <th scope='col'>id</th>
+                <th scope='col'>Name</th>
+                <th scope='col'>Brand</th>
+                <th scope='col'>Created At</th>
+                <th scope='col'></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each lProduct}}
+                <tr>
+                    <td>
+                        <div class='form-check'>
+                            <input class='form-check-input' type='checkbox' name='checkItem' id='flexCheckDefault'
+                                value='{{this._id}}' />
+                        </div>
+                    </td>
+                    <th scope='row'>{{@index}}</th>
+                    <td>{{this.proName}}</td>
+                    <td>{{this.brand}}</td>
+                    <td>{{this.createdAt}}</td>
+                    <td>
+                        <a data-id='{{this._id}}' class='btn btn-success btn-restore'>restore</a>
+                        <a class='btn btn-danger' data-bs-toggle='modal' data-id='{{this._id}}'
+                            data-bs-target='#deleteChecking'>delete</a>
+                    </td>
+                </tr>
+            {{else}}
+                <tr class='text-center'>
+                    <td colspan='5'>Quay lại trang Danh sách sản phẩm
+                        <a href='/personal/stored/manage'>Quay lại</a>
+                    </td>
+                </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</form>
+
+{{! modal for checking delete }}
+<div id='deleteChecking' class='modal' tabindex='-1'>
+    <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <h5 class='modal-title'>Bạn có chắc chắn xóa sản phẩm này ra
+                    khỏi giỏ hàng khồng?</h5>
+                <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+            </div>
+            <div class='modal-body'>
+                <p>Xóa thì không trả lại được đâu.</p>
+            </div>
+            <div class='modal-footer'>
+                <button id='delete-button' type='button' class='btn btn-primary'>Delete</button>
+                <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{! Handle deleting  }}
+<form method='POST' name='delete-product-form'></form>
+<form method='POST' name='restore-product-form'></form>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var productId;
+        var deleteForm = document.forms['delete-product-form']; var restoreForm =
+            document.forms['restore-product-form']; const btnRestore =
+                $('.btn-restore'); console.log(btnRestore); console.log(btnRestore); const
+                    deleteChecking = document.getElementById('deleteChecking'); var deleteForm =
+                        document.forms['delete-product-form']; var checkItems =
+                            $('input[name="checkItem"]'); var containerForm =
+                                document.forms['container-form']; var checkAllBtn = $('#checkAllBtn'); var
+                                    actionBtn = $('.option-action-btn') // check vào button all check
+        checkAllBtn.change(function (e) {
+            var isCheck = $(this).prop('checked');
+            checkItems.prop('checked', isCheck); renderAllSubmitButton();
+        }) // listen
+    to the checkItem change checkItems.change(function (e) {
+            var isCheckAll =
+                checkItems.length === $('input[name="checkItem"]:checked').length;
+            checkAllBtn.prop('checked', isCheckAll); renderAllSubmitButton();
+        }); //
+    handle check items function renderAllSubmitButton() {
+            var checkCount =
+                $('input[name="checkItem"]:checked').length;
+            actionBtn.toggleClass('disabled', !(checkCount > 0));
+        } // submit form checking
+        containerForm.on('submit', function (e) {
+            var isValid =
+                !actionBtn.hasClass('disabled'); if (!isValid) { e.preventDefault(); }
+        }) //
+        delete modal deleteChecking.addEventListener('show.bs.modal', event => {
+            const button = event.relatedTarget; productId =
+                button.getAttribute('data-id'); const deleteButton =
+                    document.getElementById('delete-button'); deleteButton.onclick = function () {
+                        deleteForm.action = '/products/' + productId + '/force?_method=DELETE';
+                        deleteForm.submit();
+                    }
+        }) btnRestore.click(function (e) {
+            e.preventDefault(); var restoreProductId = $(this).data('id');
+            restoreForm.action = '/products/' + restoreProductId +
+                '/restore?_method=PATCH'; restoreForm.submit();
+        })
+    })
+
+</script>
